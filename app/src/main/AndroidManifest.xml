@@ -13,7 +13,11 @@
             android:value="true" />
         <meta-data
             android:name="xposedminversion"
-            android:value="82" />
+            android:value="93" />
+        <!-- 让 LSPosed 把配置写到可被目标进程读取的目录，而不是本应用私有目录。 -->
+        <meta-data
+            android:name="xposedsharedprefs"
+            android:value="true" />
         <meta-data
             android:name="xposeddescription"
             android:value="@string/xposed_description" />

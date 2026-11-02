@@ -5,6 +5,7 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -68,6 +69,7 @@ public class XposedMod implements IXposedHookLoadPackage {
 
     private XSharedPreferences prefs;
     private boolean loggedStatusFailure;
+    private boolean loggedSecureStrip;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -76,9 +78,15 @@ public class XposedMod implements IXposedHookLoadPackage {
         }
 
         prefs = new XSharedPreferences(MODULE_PKG, SettingsActivity.PREFS);
-        prefs.makeWorldReadable();
+        File prefFile = prefs.getFile();
+        boolean readable = prefFile != null && prefFile.canRead();
+        if (!readable) {
+            prefs.makeWorldReadable();
+            readable = prefFile != null && prefFile.canRead();
+        }
         prefs.reload();
-        log("loaded fold=" + foldEnabled() + " shot=" + shotEnabled());
+        log("loaded fold=" + foldEnabled() + " shot=" + shotEnabled()
+                + " prefs=" + prefFile + " readable=" + readable);
 
         hookScreenshot();
         hookEpisodeLists(lpparam);
@@ -87,9 +95,9 @@ public class XposedMod implements IXposedHookLoadPackage {
     private boolean foldEnabled() {
         if (prefs != null) {
             prefs.reload();
-            return prefs.getBoolean(SettingsActivity.KEY_FOLD, false);
+            return prefs.getBoolean(SettingsActivity.KEY_FOLD, true);
         }
-        return false;
+        return true;
     }
 
     private boolean shotEnabled() {
@@ -114,6 +122,10 @@ public class XposedMod implements IXposedHookLoadPackage {
                 int flags = (Integer) param.args[0];
                 if ((flags & FLAG_SECURE) != 0) {
                     param.args[0] = flags & ~FLAG_SECURE;
+                    if (!loggedSecureStrip) {
+                        loggedSecureStrip = true;
+                        log("cleared FLAG_SECURE");
+                    }
                 }
             }
         };
