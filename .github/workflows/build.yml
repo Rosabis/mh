@@ -27,14 +27,17 @@ jobs:
           # compileSdk / build-tools versions are defined in app/build.gradle.kts
           packages: 'platforms;android-35 build-tools;36.0.0'
 
-      - name: Ensure Gradle wrapper exists
-        # The wrapper jar is not committed; generate it on the fly so `./gradlew` works.
+      - name: Ensure Gradle wrapper is executable
+        # gradlew is often committed as mode 644 from Windows, which makes
+        # `./gradlew` fail on Linux with "Permission denied" (exit 126).
+        # Regenerate the wrapper only when the script itself is missing.
         run: |
           if [ ! -f gradlew ]; then
-          curl -sL https://services.gradle.org/distributions/gradle-9.4.1-bin.zip -o /tmp/gradle.zip
-          unzip -q /tmp/gradle.zip -d /tmp
-          /tmp/gradle-9.4.1/bin/gradle wrapper --gradle-version 9.4.1
+            curl -sL https://services.gradle.org/distributions/gradle-9.4.1-bin.zip -o /tmp/gradle.zip
+            unzip -q /tmp/gradle.zip -d /tmp
+            /tmp/gradle-9.4.1/bin/gradle wrapper --gradle-version 9.4.1
           fi
+          chmod +x gradlew
 
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
