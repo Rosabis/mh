@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WEBTOON 折叠模块</string>
+    <string name="xposed_description">折叠 WEBTOON 需看广告/付费解锁的章节，并关闭截图限制</string>
+
+    <string name="fold_title">折叠锁定章节</string>
+    <string name="fold_summary">隐藏标题页里还没解锁的广告章和付费章，已购买或已看完广告的章节会保留。Canvas 同人列表同样生效。</string>
+
+    <string name="shot_title">关闭截图限制</string>
+    <string name="shot_summary">移除 FLAG_SECURE，允许截图 / 录屏</string>
+
+    <string name="hint_restart">修改后请在 LSPosed 中重启 WEBTOON 生效。</string>
+
+    <string name="target_version">26.102.0</string>
+</resources>
